@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Registro Detalhado — Life Tech Pro</title>
+<style>
+  :root{
+    --bg:#071416;
+    --card:#00d398;
+    --panel:#0b2b2a;
+    --text:#e9fff9;
+    --muted:rgba(255,255,255,0.15);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:linear-gradient(180deg,#031616 0%,#072d34 100%);
+       font-family:'Poppins',sans-serif;color:var(--text)}
+  .wrap{max-width:1100px;margin:40px auto;padding:24px}
+  header{display:flex;align-items:center;justify-content:space-between;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.1)}
+  h1{margin:0;color:var(--card);letter-spacing:0.6px}
+  a.back{color:var(--muted);text-decoration:none;font-weight:700}
+  table{
+    width:100%;border-collapse:collapse;margin-top:24px;
+    background:rgba(255,255,255,0.03);border-radius:12px;overflow:hidden;
+    box-shadow:0 10px 25px rgba(0,0,0,0.3)
+  }
+  th, td{padding:14px;text-align:left;font-size:0.95rem}
+  th{background:rgba(255,255,255,0.08);color:var(--card);text-transform:uppercase;letter-spacing:0.5px}
+  tr:nth-child(even){background:rgba(255,255,255,0.02)}
+  tr:hover{background:rgba(255,255,255,0.05)}
+  input, select{
+    background:rgba(255,255,255,0.08);
+    border:none;border-radius:6px;
+    color:var(--text);
+    padding:6px 8px;font-size:0.9rem;width:100%;
+  }
+  button{
+    background:var(--card);border:none;padding:8px 12px;border-radius:10px;
+    color:#042422;font-weight:700;cursor:pointer;transition:transform 0.2s;
+  }
+  button:hover{transform:scale(1.05);background:#00b682}
+  .footer{margin-top:60px;text-align:center;color:rgba(255,255,255,0.35)}
+  .total-box{
+    margin-top:24px;
+    background:rgba(255,255,255,0.05);
+    padding:12px 18px;border-radius:12px;
+    display:flex;justify-content:space-between;align-items:center;
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Registro Detalhado</h1>
+      <a href="index.html" class="back">← Voltar ao painel</a>
+    </header>
+
+    <div style="margin-top:20px;">
+      <label>Cliente:</label>
+      <select id="clienteSelect" onchange="carregarEmprestimos()">
+        <option value="">Selecione o cliente</option>
+        <option value="João Silva">João Silva</option>
+        <option value="Maria Souza">Maria Souza</option>
+      </select>
+    </div>
+
+    <table id="tabelaDetalhes">
+      <thead>
+        <tr>
+          <th>Data</th>
+          <th>Valor (R$)</th>
+          <th>Vencimento</th>
+          <th>Status</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <button style="margin-top:18px;" onclick="adicionarLinha()">+ Adicionar Empréstimo</button>
+
+    <div class="total-box">
+      <div>Total do Cliente:</div>
+      <div id="totalValor">R$ 0,00</div>
+    </div>
+
+    <div class="footer">© 2025 — AgroScan · Design Futurista</div>
+  </div>
+
+  <script>
+    const storageKey = 'emprestimos_detalhados';
+    let emprestimos = JSON.parse(localStorage.getItem(storageKey)) || {};
+
+    const tabela = document.querySelector("#tabelaDetalhes tbody");
+    const clienteSelect = document.getElementById("clienteSelect");
+    const totalValor = document.getElementById("totalValor");
+
+    function carregarEmprestimos(){
+      tabela.innerHTML = "";
+      const cliente = clienteSelect.value;
+      if(!cliente) return;
+
+      const lista = emprestimos[cliente] || [];
+      lista.forEach((emp, i) => criarLinha(emp, i));
+      atualizarTotal();
+    }
+
+    function criarLinha(emp = {data:"", valor:"", vencimento:"", status:"Ativo"}, index = null){
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td><input type="date" value="${emp.data}"></td>
+        <td><input type="number" value="${emp.valor}" step="0.01"></td>
+        <td><input type="date" value="${emp.vencimento}"></td>
+        <td>
+          <select>
+            <option ${emp.status==="Ativo"?"selected":""}>Ativo</option>
+            <option ${emp.status==="Atrasado"?"selected":""}>Atrasado</option>
+            <option ${emp.status==="Pago"?"selected":""}>Pago</option>
+          </select>
+        </td>
+        <td>
+          <button onclick="salvar()">💾</button>
+          <button onclick="removerLinha(this)">🗑️</button>
+        </td>
+      `;
+      tabela.appendChild(tr);
+    }
+
+    function adicionarLinha(){
+      if(!clienteSelect.value){
+        alert("Selecione um cliente primeiro!");
+        return;
+      }
+      criarLinha();
+    }
+
+    function salvar(){
+      const cliente = clienteSelect.value;
+      if(!cliente){ alert("Selecione o cliente antes de salvar!"); return; }
+
+      const linhas = tabela.querySelectorAll("tr");
+      const lista = Array.from(linhas).map(linha => ({
+        data: linha.cells[0].querySelector("input").value,
+        valor: parseFloat(linha.cells[1].querySelector("input").value) || 0,
+        vencimento: linha.cells[2].querySelector("input").value,
+        status: linha.cells[3].querySelector("select").value
+      }));
+
+      emprestimos[cliente] = lista;
+      localStorage.setItem(storageKey, JSON.stringify(emprestimos));
+      atualizarTotal();
+      alert("💾 Dados salvos com sucesso!");
+    }
+
+    function removerLinha(btn){
+      btn.closest("tr").remove();
+      salvar();
+    }
+
+    function atualizarTotal(){
+      const cliente = clienteSelect.value;
+      if(!cliente){ totalValor.textContent = "R$ 0,00"; return; }
+
+      const lista = emprestimos[cliente] || [];
+      const total = lista.reduce((acc, emp) => acc + (parseFloat(emp.valor) || 0), 0);
+      totalValor.textContent = "R$ " + total.toFixed(2);
+    }
+
+    window.addEventListener("load", carregarEmprestimos);
+  </script>
+</body>
+</html>

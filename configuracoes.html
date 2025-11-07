@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>AgroScan Hub — Configurações</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div style="display:flex;align-items:center;gap:18px">
+        <div style="width:8px;height:48px;background:var(--card);border-radius:6px"></div>
+        <h1>AgroScan Hub</h1>
+      </div>
+      <nav>
+        <a href="index.html">Cadastrar</a>
+        <a href="emprestimos.html">Empréstimos</a>
+        <a href="registro_detalhado.html">Registro Detalhado</a>
+      </nav>
+    </header>
+
+    <main class="wrap-inner">
+      <section class="card">
+        <h2>Configurações</h2>
+        <label>Cor do Tema
+          <input id="themeColor" type="color" value="#00d398"/>
+        </label>
+        <label>Nome do Painel
+          <input id="panelName" type="text" value="AgroScan Hub" />
+        </label>
+        <div style="margin-top:12px">
+          <button class="btn" id="btnSaveConfig">Salvar</button>
+          <button class="btn ghost" id="btnReset">Resetar Dados</button>
+        </div>
+      </section>
+    </main>
+
+    <div class="footer">© 2025 — AgroScan · Design Futurista</div>
+  </div>
+
+<script src="assets/script.js"></script>
+</body>
+</html>

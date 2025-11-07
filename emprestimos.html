@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Empréstimos Registrados — AgroScan Hub</title>
+<style>
+  :root{
+    --bg:#071416;
+    --card:#00d398;
+    --panel:#0b2b2a;
+    --text:#e9fff9;
+    --muted:rgba(255,255,255,0.15);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:linear-gradient(180deg,#031616 0%,#072d34 100%);font-family:'Poppins',sans-serif;color:var(--text)}
+  .wrap{max-width:1000px;margin:40px auto;padding:24px}
+  header{display:flex;align-items:center;justify-content:space-between;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.1)}
+  h1{margin:0;color:var(--card);letter-spacing:0.6px}
+  a.back{color:var(--muted);text-decoration:none;font-weight:700}
+  table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:24px;
+    background:rgba(255,255,255,0.03);
+    border-radius:12px;
+    overflow:hidden;
+    box-shadow:0 10px 25px rgba(0,0,0,0.3);
+  }
+  th, td{
+    padding:14px;
+    text-align:left;
+    font-size:0.95rem;
+  }
+  th{
+    background:rgba(255,255,255,0.08);
+    color:var(--card);
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+  }
+  tr:nth-child(even){background:rgba(255,255,255,0.02)}
+  tr:hover{background:rgba(255,255,255,0.05)}
+  .actions button{
+    background:var(--card);
+    border:none;
+    padding:6px 10px;
+    border-radius:8px;
+    color:#042422;
+    font-weight:700;
+    cursor:pointer;
+    transition:transform 0.2s;
+  }
+  .actions button:hover{transform:scale(1.05);background:#00b682}
+  input.search{
+    width:100%;
+    padding:10px 12px;
+    border-radius:10px;
+    border:none;
+    background:rgba(255,255,255,0.08);
+    color:var(--text);
+    margin-top:20px;
+    font-size:1rem;
+  }
+  .footer{margin-top:60px;text-align:center;color:rgba(255,255,255,0.35)}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Empréstimos Registrados</h1>
+      <a href="index.html" class="back">← Voltar ao painel</a>
+    </header>
+
+    <input type="text" id="search" class="search" placeholder="🔍 Buscar por nome do cliente..." onkeyup="filtrarTabela()">
+
+    <table id="tabelaEmprestimos">
+      <thead>
+        <tr>
+          <th>Cliente</th>
+          <th>Valor (R$)</th>
+          <th>Juros (%)</th>
+          <th>Total (R$)</th>
+          <th>Data</th>
+          <th>Prazo</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody id="tbodyEmprestimos">
+        <!-- preenchido dinamicamente -->
+      </tbody>
+    </table>
+
+    <div class="footer">© 2025 — AgroScan · Design Futurista</div>
+  </div>
+
+  <script>
+    // Carrega dados salvos do localStorage
+    function carregarEmprestimos() {
+      const tabela = document.getElementById("tbodyEmprestimos");
+      tabela.innerHTML = "";
+
+      const db = JSON.parse(localStorage.getItem("agroscan_data") || "{}");
+
+      const clientes = Object.keys(db);
+      if (clientes.length === 0) {
+        tabela.innerHTML = '<tr><td colspan="7" style="text-align:center;opacity:0.7">Nenhum empréstimo registrado ainda.</td></tr>';
+        return;
+      }
+
+      clientes.forEach(cliente => {
+        db[cliente].forEach((r, i) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${cliente}</td>
+            <td>${r.valor ?? '-'}</td>
+            <td>${r.juros ?? '-'}</td>
+            <td>${r.total ?? '-'}</td>
+            <td>${r.data ?? '-'}</td>
+            <td>${r.prazo ?? '-'}</td>
+            <td class="actions">
+              <button onclick="excluir('${cliente}', ${i})">🗑️</button>
+            </td>
+          `;
+          tabela.appendChild(tr);
+        });
+      });
+    }
+
+    // Excluir registro e atualizar tabela
+    function excluir(cliente, index) {
+      if (!confirm("Deseja realmente excluir este registro?")) return;
+
+      const db = JSON.parse(localStorage.getItem("agroscan_data") || "{}");
+      if (!db[cliente]) return;
+
+      db[cliente].splice(index, 1);
+      if (db[cliente].length === 0) delete db[cliente];
+
+      localStorage.setItem("agroscan_data", JSON.stringify(db));
+      carregarEmprestimos();
+    }
+
+    // Filtro de busca
+    function filtrarTabela() {
+      const input = document.getElementById("search").value.toLowerCase();
+      const linhas = document.querySelectorAll("#tabelaEmprestimos tbody tr");
+      linhas.forEach(linha => {
+        const nome = linha.cells[0].innerText.toLowerCase();
+        linha.style.display = nome.includes(input) ? "" : "none";
+      });
+    }
+
+    // Executa ao abrir a página
+    carregarEmprestimos();
+  </script>
+</body>
+</html>
