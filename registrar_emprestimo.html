@@ -80,9 +80,9 @@
       <label for="status">Status</label>
       <select id="status" name="status" required>
         <option value="">Selecione...</option>
-        <option value="ativo">Ativo</option>
-        <option value="quitado">Quitado</option>
-        <option value="atrasado">Atrasado</option>
+        <option value="Ativo">Ativo</option>
+        <option value="Quitado">Quitado</option>
+        <option value="Atrasado">Atrasado</option>
       </select>
 
       <label for="observacoes">Observações</label>
@@ -91,12 +91,31 @@
       <button type="submit">💾 Salvar Empréstimo</button>
     </form>
 
-    <div class="footer">© 2025 — AgroScan · Design Futurista</div>
+    <div class="footer">© 2025 — Life Tech Pro · Design Futurista</div>
   </div>
 
   <script>
     document.getElementById('emprestimoForm').addEventListener('submit', function(e){
       e.preventDefault();
+
+      // Obter os valores do formulário
+      const emprestimo = {
+        nomeCliente: document.getElementById('nomeCliente').value,
+        valor: parseFloat(document.getElementById('valor').value),
+        juros: parseFloat(document.getElementById('juros').value),
+        dataEmprestimo: document.getElementById('dataEmprestimo').value,
+        vencimento: document.getElementById('vencimento').value,
+        status: document.getElementById('status').value,
+        observacoes: document.getElementById('observacoes').value
+      };
+
+      // Carregar lista atual do localStorage
+      const lista = JSON.parse(localStorage.getItem('emprestimos')) || [];
+      lista.push(emprestimo);
+
+      // Salvar de volta
+      localStorage.setItem('emprestimos', JSON.stringify(lista));
+
       alert('✅ Empréstimo registrado com sucesso!');
       this.reset();
     });
