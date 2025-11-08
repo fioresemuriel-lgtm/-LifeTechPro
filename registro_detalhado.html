@@ -13,8 +13,12 @@
     --muted:rgba(255,255,255,0.15);
   }
   *{box-sizing:border-box}
-  body{margin:0;background:linear-gradient(180deg,#031616 0%,#072d34 100%);
-       font-family:'Poppins',sans-serif;color:var(--text)}
+  body{
+    margin:0;
+    background:linear-gradient(180deg,#031616 0%,#072d34 100%);
+    font-family:'Poppins',sans-serif;
+    color:var(--text)
+  }
   .wrap{max-width:1100px;margin:40px auto;padding:24px}
   header{display:flex;align-items:center;justify-content:space-between;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.1)}
   h1{margin:0;color:var(--card);letter-spacing:0.6px}
@@ -59,8 +63,6 @@
       <label>Cliente:</label>
       <select id="clienteSelect" onchange="carregarEmprestimos()">
         <option value="">Selecione o cliente</option>
-        <option value="João Silva">João Silva</option>
-        <option value="Maria Souza">Maria Souza</option>
       </select>
     </div>
 
@@ -88,34 +90,41 @@
   </div>
 
   <script>
-    const storageKey = 'emprestimos_detalhados';
-    let emprestimos = JSON.parse(localStorage.getItem(storageKey)) || {};
+    const storageKey = 'emprestimos'; // usa a mesma chave do outro arquivo
+    let emprestimos = JSON.parse(localStorage.getItem(storageKey)) || [];
 
     const tabela = document.querySelector("#tabelaDetalhes tbody");
     const clienteSelect = document.getElementById("clienteSelect");
     const totalValor = document.getElementById("totalValor");
+
+    // Preenche a lista de clientes automaticamente
+    function preencherClientes(){
+      const nomes = [...new Set(emprestimos.map(e => e.nomeCliente))];
+      clienteSelect.innerHTML = '<option value="">Selecione o cliente</option>' +
+        nomes.map(n => `<option value="${n}">${n}</option>`).join('');
+    }
 
     function carregarEmprestimos(){
       tabela.innerHTML = "";
       const cliente = clienteSelect.value;
       if(!cliente) return;
 
-      const lista = emprestimos[cliente] || [];
+      const lista = emprestimos.filter(e => e.nomeCliente === cliente);
       lista.forEach((emp, i) => criarLinha(emp, i));
       atualizarTotal();
     }
 
-    function criarLinha(emp = {data:"", valor:"", vencimento:"", status:"Ativo"}, index = null){
+    function criarLinha(emp = {dataEmprestimo:"", valor:0, vencimento:"", status:"Ativo"}, index = null){
       const tr = document.createElement("tr");
       tr.innerHTML = `
-        <td><input type="date" value="${emp.data}"></td>
-        <td><input type="number" value="${emp.valor}" step="0.01"></td>
-        <td><input type="date" value="${emp.vencimento}"></td>
+        <td><input type="date" value="${emp.dataEmprestimo || ""}"></td>
+        <td><input type="number" value="${emp.valor || 0}" step="0.01"></td>
+        <td><input type="date" value="${emp.vencimento || ""}"></td>
         <td>
           <select>
             <option ${emp.status==="Ativo"?"selected":""}>Ativo</option>
             <option ${emp.status==="Atrasado"?"selected":""}>Atrasado</option>
-            <option ${emp.status==="Pago"?"selected":""}>Pago</option>
+            <option ${emp.status==="Quitado"?"selected":""}>Quitado</option>
           </select>
         </td>
         <td>
@@ -138,15 +147,19 @@
       const cliente = clienteSelect.value;
       if(!cliente){ alert("Selecione o cliente antes de salvar!"); return; }
 
+      // remove antigos registros desse cliente
+      emprestimos = emprestimos.filter(e => e.nomeCliente !== cliente);
+
       const linhas = tabela.querySelectorAll("tr");
-      const lista = Array.from(linhas).map(linha => ({
-        data: linha.cells[0].querySelector("input").value,
+      const novos = Array.from(linhas).map(linha => ({
+        nomeCliente: cliente,
+        dataEmprestimo: linha.cells[0].querySelector("input").value,
         valor: parseFloat(linha.cells[1].querySelector("input").value) || 0,
         vencimento: linha.cells[2].querySelector("input").value,
         status: linha.cells[3].querySelector("select").value
       }));
 
-      emprestimos[cliente] = lista;
+      emprestimos.push(...novos);
       localStorage.setItem(storageKey, JSON.stringify(emprestimos));
       atualizarTotal();
       alert("💾 Dados salvos com sucesso!");
@@ -161,12 +174,15 @@
       const cliente = clienteSelect.value;
       if(!cliente){ totalValor.textContent = "R$ 0,00"; return; }
 
-      const lista = emprestimos[cliente] || [];
+      const lista = emprestimos.filter(e => e.nomeCliente === cliente);
       const total = lista.reduce((acc, emp) => acc + (parseFloat(emp.valor) || 0), 0);
       totalValor.textContent = "R$ " + total.toFixed(2);
     }
 
-    window.addEventListener("load", carregarEmprestimos);
+    window.addEventListener("load", () => {
+      preencherClientes();
+      carregarEmprestimos();
+    });
   </script>
 </body>
 </html>
