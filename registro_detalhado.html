@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Registro Detalhado — Life Tech Pro</title>
+<title data-i18n="titulo_registro_detalhado">Registro Detalhado — Life Tech Pro</title>
 <style>
   :root{
     --bg:#071416;
     --card:#00d398;
     --panel:#0b2b2a;
-    --text:#e9fff9;
+    --text:#a5a5a5;
     --muted:rgba(255,255,255,0.15);
   }
   *{box-sizing:border-box}
@@ -55,52 +55,58 @@
 <body>
   <div class="wrap">
     <header>
-      <h1>Registro Detalhado</h1>
-      <a href="index.html" class="back">← Voltar ao painel</a>
+      <h1 data-i18n="registro_detalhado">Registro Detalhado</h1>
+      <a href="index.html" class="back" data-i18n="voltar_painel">← Voltar ao painel</a>
     </header>
 
     <div style="margin-top:20px;">
-      <label>Cliente:</label>
+      <label data-i18n="cliente">Cliente:</label>
       <select id="clienteSelect" onchange="carregarEmprestimos()">
-        <option value="">Selecione o cliente</option>
+        <option value="" data-i18n="selecione_cliente">Selecione o cliente</option>
       </select>
     </div>
 
     <table id="tabelaDetalhes">
       <thead>
         <tr>
-          <th>Data</th>
-          <th>Valor (R$)</th>
-          <th>Vencimento</th>
-          <th>Status</th>
-          <th>Ações</th>
+          <th data-i18n="data">Data</th>
+          <th data-i18n="valor">Valor (R$)</th>
+          <th data-i18n="juros">Juros (%)</th>
+          <th data-i18n="vencimento">Vencimento</th>
+          <th data-i18n="status">Status</th>
+          <th data-i18n="acoes">Ações</th>
         </tr>
       </thead>
       <tbody></tbody>
     </table>
 
-    <button style="margin-top:18px;" onclick="adicionarLinha()">+ Adicionar Empréstimo</button>
+    <button style="margin-top:18px;" onclick="adicionarLinha()" data-i18n="adicionar_emprestimo">+ Adicionar Empréstimo</button>
 
     <div class="total-box">
-      <div>Total do Cliente:</div>
+      <div data-i18n="total_com_juros">Total com Juros:</div>
       <div id="totalValor">R$ 0,00</div>
     </div>
 
-    <div class="footer">© 2025 — AgroScan · Design Futurista</div>
+    <div class="footer" data-i18n="rodape">© 2025 — Life Tech Pro · Design Futurista</div>
   </div>
 
   <script>
-    const storageKey = 'emprestimos'; // usa a mesma chave do outro arquivo
+    const storageKey = 'emprestimos';
     let emprestimos = JSON.parse(localStorage.getItem(storageKey)) || [];
 
     const tabela = document.querySelector("#tabelaDetalhes tbody");
     const clienteSelect = document.getElementById("clienteSelect");
     const totalValor = document.getElementById("totalValor");
 
-    // Preenche a lista de clientes automaticamente
     function preencherClientes(){
       const nomes = [...new Set(emprestimos.map(e => e.nomeCliente))];
-      clienteSelect.innerHTML = '<option value="">Selecione o cliente</option>' +
+      const idioma = localStorage.getItem("idiomaAgroScan") || "pt";
+      const textos = {
+        pt: "Selecione o cliente",
+        en: "Select client",
+        es: "Seleccione el cliente"
+      };
+      clienteSelect.innerHTML = `<option value="">${textos[idioma]}</option>` +
         nomes.map(n => `<option value="${n}">${n}</option>`).join('');
     }
 
@@ -114,17 +120,18 @@
       atualizarTotal();
     }
 
-    function criarLinha(emp = {dataEmprestimo:"", valor:0, vencimento:"", status:"Ativo"}, index = null){
+    function criarLinha(emp = {dataEmprestimo:"", valor:0, juros:0, vencimento:"", status:"Ativo"}, index = null){
       const tr = document.createElement("tr");
       tr.innerHTML = `
         <td><input type="date" value="${emp.dataEmprestimo || ""}"></td>
         <td><input type="number" value="${emp.valor || 0}" step="0.01"></td>
+        <td><input type="number" value="${emp.juros || 0}" step="0.01"></td>
         <td><input type="date" value="${emp.vencimento || ""}"></td>
         <td>
           <select>
-            <option ${emp.status==="Ativo"?"selected":""}>Ativo</option>
-            <option ${emp.status==="Atrasado"?"selected":""}>Atrasado</option>
-            <option ${emp.status==="Quitado"?"selected":""}>Quitado</option>
+            <option ${emp.status==="Ativo"?"selected":""} data-i18n="ativo">Ativo</option>
+            <option ${emp.status==="Atrasado"?"selected":""} data-i18n="atrasado">Atrasado</option>
+            <option ${emp.status==="Quitado"?"selected":""} data-i18n="quitado">Quitado</option>
           </select>
         </td>
         <td>
@@ -136,18 +143,30 @@
     }
 
     function adicionarLinha(){
+      const idioma = localStorage.getItem("idiomaAgroScan") || "pt";
+      const mensagens = {
+        pt: "Selecione um cliente primeiro!",
+        en: "Select a client first!",
+        es: "¡Seleccione un cliente primero!"
+      };
       if(!clienteSelect.value){
-        alert("Selecione um cliente primeiro!");
+        alert(mensagens[idioma]);
         return;
       }
       criarLinha();
     }
 
     function salvar(){
-      const cliente = clienteSelect.value;
-      if(!cliente){ alert("Selecione o cliente antes de salvar!"); return; }
+      const idioma = localStorage.getItem("idiomaAgroScan") || "pt";
+      const mensagens = {
+        pt: { selecione: "Selecione o cliente antes de salvar!", salvo: "💾 Dados salvos com sucesso!" },
+        en: { selecione: "Select the client before saving!", salvo: "💾 Data saved successfully!" },
+        es: { selecione: "¡Seleccione el cliente antes de guardar!", salvo: "💾 ¡Datos guardados correctamente!" }
+      };
 
-      // remove antigos registros desse cliente
+      const cliente = clienteSelect.value;
+      if(!cliente){ alert(mensagens[idioma].selecione); return; }
+
       emprestimos = emprestimos.filter(e => e.nomeCliente !== cliente);
 
       const linhas = tabela.querySelectorAll("tr");
@@ -155,14 +174,15 @@
         nomeCliente: cliente,
         dataEmprestimo: linha.cells[0].querySelector("input").value,
         valor: parseFloat(linha.cells[1].querySelector("input").value) || 0,
-        vencimento: linha.cells[2].querySelector("input").value,
-        status: linha.cells[3].querySelector("select").value
+        juros: parseFloat(linha.cells[2].querySelector("input").value) || 0,
+        vencimento: linha.cells[3].querySelector("input").value,
+        status: linha.cells[4].querySelector("select").value
       }));
 
       emprestimos.push(...novos);
       localStorage.setItem(storageKey, JSON.stringify(emprestimos));
       atualizarTotal();
-      alert("💾 Dados salvos com sucesso!");
+      alert(mensagens[idioma].salvo);
     }
 
     function removerLinha(btn){
@@ -175,7 +195,10 @@
       if(!cliente){ totalValor.textContent = "R$ 0,00"; return; }
 
       const lista = emprestimos.filter(e => e.nomeCliente === cliente);
-      const total = lista.reduce((acc, emp) => acc + (parseFloat(emp.valor) || 0), 0);
+      const total = lista.reduce((acc, emp) => {
+        const valorComJuros = emp.valor + (emp.valor * (emp.juros || 0) / 100);
+        return acc + valorComJuros;
+      }, 0);
       totalValor.textContent = "R$ " + total.toFixed(2);
     }
 
@@ -184,5 +207,9 @@
       carregarEmprestimos();
     });
   </script>
+
+  <script src="assets/global-config.js"></script>
+  <script src="assets/lang.js"></script>
+  <script src="assets/script.js"></script>
 </body>
 </html>
