@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Empréstimos Registrados — Life Tech Pro</title>
+<title data-i18n="emprestimos_registrados">Empréstimos Registrados — AgroScan Hub</title>
 <style>
   :root{
     --bg:#071416;
@@ -13,27 +13,27 @@
     --muted:rgba(255,255,255,0.15);
   }
   *{box-sizing:border-box}
-  body{margin:0;background:linear-gradient(180deg,#031616 0%,#072d34 100%);
-       font-family:'Poppins',sans-serif;color:var(--text)}
+  body{
+    margin:0;
+    background:linear-gradient(180deg,#031616 0%,#072d34 100%);
+    font-family:'Poppins',sans-serif;
+    color:var(--text);
+    transition:background 0.3s,color 0.3s;
+  }
   .wrap{max-width:1000px;margin:40px auto;padding:24px}
-  header{display:flex;align-items:center;justify-content:space-between;
-         padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.1)}
+  header{
+    display:flex;align-items:center;justify-content:space-between;
+    padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.1)
+  }
   h1{margin:0;color:var(--card);letter-spacing:0.6px}
   a.back{color:var(--muted);text-decoration:none;font-weight:700}
   table{
-    width:100%;
-    border-collapse:collapse;
-    margin-top:24px;
+    width:100%;border-collapse:collapse;margin-top:24px;
     background:rgba(255,255,255,0.03);
-    border-radius:12px;
-    overflow:hidden;
-    box-shadow:0 10px 25px rgba(0,0,0,0.3);
+    border-radius:12px;overflow:hidden;
+    box-shadow:0 10px 25px rgba(0,0,0,0.3)
   }
-  th, td{
-    padding:14px;
-    text-align:left;
-    font-size:0.95rem;
-  }
+  th, td{padding:14px;text-align:left;font-size:0.95rem}
   th{
     background:rgba(255,255,255,0.08);
     color:var(--card);
@@ -64,72 +64,108 @@
     font-size:1rem;
   }
   .footer{margin-top:60px;text-align:center;color:rgba(255,255,255,0.35)}
+  .total-geral{
+    margin-top:20px;
+    text-align:right;
+    font-weight:700;
+    color:var(--card);
+    font-size:1.1rem;
+  }
+  body.dark{
+    background:linear-gradient(180deg,#020c0d 0%,#041c1d 100%);
+    color:#cfece4;
+  }
 </style>
 </head>
 <body>
   <div class="wrap">
     <header>
-      <h1>Empréstimos Registrados</h1>
-      <a href="index.html" class="back">← Voltar ao painel</a>
+      <h1 data-i18n="emprestimos_registrados">Empréstimos Registrados</h1>
+      <a href="index.html" class="back" data-i18n="voltar_painel">← Voltar ao painel</a>
     </header>
 
     <input type="text" id="search" class="search"
            placeholder="🔍 Buscar por nome do cliente..."
+           data-i18n-placeholder="buscar_cliente"
            onkeyup="filtrarTabela()">
 
     <table id="tabelaEmprestimos">
       <thead>
         <tr>
-          <th>Cliente</th>
-          <th>Valor (R$)</th>
-          <th>Juros (%)</th>
-          <th>Data</th>
-          <th>Vencimento</th>
-          <th>Status</th>
-          <th>Ações</th>
+          <th data-i18n="cliente">Cliente</th>
+          <th data-i18n="valor">Valor (R$)</th>
+          <th data-i18n="juros">Juros (%)</th>
+          <th data-i18n="total_juros">Total com Juros (R$)</th>
+          <th data-i18n="data">Data</th>
+          <th data-i18n="vencimento">Vencimento</th>
+          <th data-i18n="status">Status</th>
+          <th data-i18n="acoes">Ações</th>
         </tr>
       </thead>
       <tbody>
-        <!-- Preenchido via JS -->
+        <!-- preenchido via JS -->
       </tbody>
     </table>
 
-    <div class="footer">© 2025 — Life Tech Pro · Design Futurista</div>
+    <div class="total-geral" id="totalGeral" data-i18n="total_geral">Total Geral: R$ 0,00</div>
+
+    <div class="footer">© 2025 — AgroScan · Design Futurista</div>
   </div>
+
+  <!-- 🌍 Configurações globais e idioma -->
+  <script src="assets/global-config.js"></script>
+  <script src="assets/lang.js"></script>
+  <script src="assets/script.js"></script>
 
   <script>
     // === FUNÇÃO PARA EXIBIR OS EMPRÉSTIMOS ===
     function carregarEmprestimos() {
       const tabela = document.querySelector("#tabelaEmprestimos tbody");
-      tabela.innerHTML = ""; // limpar antes de renderizar
+      const totalGeralEl = document.getElementById("totalGeral");
+      tabela.innerHTML = "";
 
       const lista = JSON.parse(localStorage.getItem("emprestimos")) || [];
+      const lang = JSON.parse(localStorage.getItem("configAgroScan"))?.preferencias?.idioma || "pt-BR";
+      const strings = window.langData?.[lang] || {};
 
       if (lista.length === 0) {
-        tabela.innerHTML = `<tr><td colspan="7" style="text-align:center;opacity:0.7">Nenhum empréstimo registrado.</td></tr>`;
+        tabela.innerHTML = `<tr><td colspan="8" style="text-align:center;opacity:0.7">${
+          strings.nenhum_registro || "Nenhum empréstimo registrado."
+        }</td></tr>`;
+        totalGeralEl.textContent = (strings.total_geral || "Total Geral") + ": R$ 0,00";
         return;
       }
 
+      let totalGeral = 0;
+
       lista.forEach((item, index) => {
+        const juros = parseFloat(item.juros) || 0;
+        const valor = parseFloat(item.valor) || 0;
+        const totalComJuros = valor + (valor * (juros / 100));
+        totalGeral += totalComJuros;
+
         const tr = document.createElement("tr");
         tr.innerHTML = `
           <td>${item.nomeCliente}</td>
-          <td>${item.valor.toFixed(2)}</td>
-          <td>${item.juros ? item.juros.toFixed(2) : "0.00"}</td>
+          <td>${valor.toFixed(2)}</td>
+          <td>${juros.toFixed(2)}</td>
+          <td>${totalComJuros.toFixed(2)}</td>
           <td>${item.dataEmprestimo}</td>
           <td>${item.vencimento}</td>
           <td>${item.status}</td>
-          <td class="actions">
-            <button onclick="excluir(${index})">🗑️</button>
-          </td>
+          <td class="actions"><button onclick="excluir(${index})">🗑️</button></td>
         `;
         tabela.appendChild(tr);
       });
+
+      totalGeralEl.textContent = (strings.total_geral || "Total Geral") + ": R$ " + totalGeral.toFixed(2);
     }
 
     // === EXCLUIR UM REGISTRO ===
     function excluir(index){
-      if(confirm("Deseja realmente excluir este registro?")){
+      const lang = JSON.parse(localStorage.getItem("configAgroScan"))?.preferencias?.idioma || "pt-BR";
+      const strings = window.langData?.[lang] || {};
+      if(confirm(strings.confirmar_exclusao || "Deseja realmente excluir este registro?")){
         const lista = JSON.parse(localStorage.getItem("emprestimos")) || [];
         lista.splice(index, 1);
         localStorage.setItem("emprestimos", JSON.stringify(lista));
@@ -141,14 +177,12 @@
     function filtrarTabela(){
       const input = document.getElementById("search").value.toLowerCase();
       const linhas = document.querySelectorAll("#tabelaEmprestimos tbody tr");
-
       linhas.forEach(linha => {
         const nome = linha.cells[0]?.innerText.toLowerCase();
         linha.style.display = nome.includes(input) ? "" : "none";
       });
     }
 
-    // === INICIAR AO CARREGAR ===
     document.addEventListener("DOMContentLoaded", carregarEmprestimos);
   </script>
 </body>
