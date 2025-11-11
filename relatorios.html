@@ -1,54 +1,77 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>AgroScan Hub — Relatórios</title>
-<link rel="stylesheet" href="assets/style.css">
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title data-lang="title">AgroScan Hub — Relatórios</title>
+  <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
   <div class="wrap">
     <header>
       <div style="display:flex;align-items:center;gap:18px">
         <div style="width:8px;height:48px;background:var(--card);border-radius:6px"></div>
-        <h1>AgroScan Hub</h1>
+        <h1 data-lang="appName">AgroScan Hub</h1>
       </div>
       <nav>
-        <a href="index.html">Cadastrar</a>
-        <a href="emprestimos.html">Empréstimos</a>
-        <a href="registro_detalhado.html">Registro Detalhado</a>
+        <a href="index.html" data-lang="menuCadastrar">Cadastrar</a>
+        <a href="emprestimos.html" data-lang="menuEmprestimos">Empréstimos</a>
+        <a href="registro_detalhado.html" data-lang="menuRegistroDetalhado">Registro Detalhado</a>
       </nav>
     </header>
 
     <main class="wrap-inner">
       <section class="card">
-        <h2>Gerar Relatório</h2>
+        <h2 data-lang="gerarRelatorio">Gerar Relatório</h2>
         <div class="report-actions">
-          <button class="btn" id="btnGenPDF">Gerar PDF (impressão)</button>
-          <button class="btn" id="btnGenCSV">Exportar CSV</button>
-          <button class="btn ghost" id="btnBackup">Backup JSON</button>
-          <button class="btn ghost" id="btnRestore">Restaurar JSON</button>
+          <button class="btn" id="btnGenPDF" data-lang="btnGerarPDF">Gerar PDF (impressão)</button>
+          <button class="btn" id="btnGenCSV" data-lang="btnExportarCSV">Exportar CSV</button>
+          <button class="btn ghost" id="btnBackup" data-lang="btnBackup">Backup JSON</button>
+          <button class="btn ghost" id="btnRestore" data-lang="btnRestaurar">Restaurar JSON</button>
           <input type="file" id="fileInput" style="display:none" accept=".json"/>
-          
-      <div id="preview" style="margin-top:18px">
-  <table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%">
-    <thead>
-      <tr>
-        <th>Cliente</th>
-        <th>Data</th>
-        <th>Valor (R$)</th>
-        <th>Juros (%/mês)</th>
-        <th>Prazo (meses)</th>
-        <th>Tipo</th>
-        <th>Total (R$)</th>
-      </tr>
-    </thead>
-    <tbody id="previewBody">
-      <!-- As linhas serão preenchidas dinamicamente pelo script.js -->
-    </tbody>
-  </table>
-</div>
+        </div>
 
-<script src="assets/script.js"></script>
+        <div id="preview" style="margin-top:18px">
+          <table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%">
+            <thead>
+              <tr>
+                <th data-lang="cliente">Cliente</th>
+                <th data-lang="data">Data</th>
+                <th data-lang="valor">Valor (R$)</th>
+                <th data-lang="juros">Juros (%/mês)</th>
+                <th data-lang="prazo">Prazo (meses)</th>
+                <th data-lang="tipo">Tipo</th>
+                <th data-lang="total">Total (R$)</th>
+              </tr>
+            </thead>
+            <tbody id="previewBody">
+              <!-- Linhas dinâmicas preenchidas por script.js -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <footer style="text-align:center;margin-top:30px;color:rgba(255,255,255,0.4)">
+      © <span id="anoAtual"></span> — AgroScan · <span data-lang="footerDesign">Design Futurista</span>
+    </footer>
+  </div>
+
+  <script>
+    // Atualiza o ano automaticamente
+    document.getElementById("anoAtual").textContent = new Date().getFullYear();
+  </script>
+
+  <!-- Scripts globais -->
+  <script src="assets/global-config.js"></script>
+  <script src="assets/lang.js"></script>
+  <script src="assets/script.js"></script>
+
+  <script>
+    // Aplica idioma após carregar tudo
+    window.addEventListener("DOMContentLoaded", () => {
+      if (typeof aplicarIdioma === "function") aplicarIdioma();
+    });
+  </script>
 </body>
 </html>
