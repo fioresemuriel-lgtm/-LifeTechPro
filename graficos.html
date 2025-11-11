@@ -5,31 +5,208 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>AgroScan Hub — Gráficos</title>
 <link rel="stylesheet" href="assets/style.css">
+
+<!-- 🧩 Adicionado aqui no topo -->
+<script src="assets/global-config.js"></script>
+<script src="assets/lang.js"></script>
+<script src="assets/script.js"></script>
+
+<style>
+  body {
+    background: linear-gradient(180deg, #031616 0%, #072d34 100%);
+    font-family: 'Poppins', sans-serif;
+    color: #e9fff9;
+  }
+  .wrap { max-width: 1100px; margin: 40px auto; padding: 24px; }
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  h1 { margin: 0; color: #00d398; }
+  nav a {
+    color: rgba(255,255,255,0.6);
+    text-decoration: none;
+    margin-left: 18px;
+    font-weight: 600;
+  }
+  nav a:hover { color: #00d398; }
+
+  .filtros {
+    display: flex;
+    gap: 10px;
+    margin-top: 24px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  select {
+    background: rgba(255,255,255,0.1);
+    border: none;
+    color: #e9fff9;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+  }
+  button {
+    background: #00d398;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    color: #042422;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  button:hover { background: #00b682; transform: scale(1.03); }
+
+  .graficos-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 20px;
+    margin-top: 20px;
+  }
+  .card {
+    background: rgba(255,255,255,0.05);
+    border-radius: 14px;
+    padding: 20px;
+    flex: 1;
+    min-width: 420px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+  }
+  h2 { color: #00d398; margin-bottom: 18px; text-align: center; }
+  .footer { margin-top: 50px; text-align: center; opacity: 0.5; }
+  canvas { width: 100% !important; height: 320px !important; }
+</style>
 </head>
 <body>
   <div class="wrap">
     <header>
       <div style="display:flex;align-items:center;gap:18px">
-        <div style="width:8px;height:48px;background:var(--card);border-radius:6px"></div>
-        <h1>AgroScan Hub</h1>
+        <div style="width:8px;height:48px;background:#00d398;border-radius:6px"></div>
+        <h1 data-i18n="painel">AgroScan Hub</h1>
       </div>
       <nav>
-        <a href="index.html">Cadastrar</a>
-        <a href="emprestimos.html">Empréstimos</a>
-        <a href="registro_detalhado.html">Registro Detalhado</a>
+        <a href="index.html" data-i18n="cadastrar">Início</a>
+        <a href="emprestimos.html" data-i18n="emprestimos">Empréstimos</a>
+        <a href="registro_detalhado.html" data-i18n="registro">Registro Detalhado</a>
       </nav>
     </header>
 
-    <main class="wrap-inner">
+    <section class="filtros">
+      <label data-i18n="mes">Mês:</label>
+      <select id="mesFiltro"></select>
+
+      <label data-i18n="ano">Ano:</label>
+      <select id="anoFiltro"></select>
+
+      <button onclick="atualizarGraficos()" data-i18n="atualizar">Atualizar</button>
+      <button onclick="mostrarTotal()" data-i18n="ver_total">📊 Ver Total (Todos os Períodos)</button>
+    </section>
+
+    <main class="graficos-container">
       <section class="card">
-        <h2>Gráficos</h2>
-        <canvas id="chartCanvas" width="900" height="300"></canvas>
+        <h2 data-i18n="grafico_valor">Valor Total (com Juros)</h2>
+        <canvas id="chartPizza"></canvas>
+      </section>
+
+      <section class="card">
+        <h2 data-i18n="grafico_qtd">Qtd. de Empréstimos</h2>
+        <canvas id="chartBarras"></canvas>
       </section>
     </main>
 
     <div class="footer">© 2025 — AgroScan · Design Futurista</div>
   </div>
 
-<script src="assets/script.js"></script>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <script>
+    let chartPizza, chartBarras;
+
+    function preencherFiltros() {
+      const mesSelect = document.getElementById("mesFiltro");
+      const anoSelect = document.getElementById("anoFiltro");
+      const meses = [
+        "Janeiro","Fevereiro","Março","Abril","Maio","Junho",
+        "Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"
+      ];
+      meses.forEach((m, i) => {
+        const opt = document.createElement("option");
+        opt.value = i + 1;
+        opt.textContent = m;
+        mesSelect.appendChild(opt);
+      });
+      const anoAtual = new Date().getFullYear();
+      for (let a = anoAtual - 3; a <= anoAtual + 1; a++) {
+        const opt = document.createElement("option");
+        opt.value = a;
+        opt.textContent = a;
+        if (a === anoAtual) opt.selected = true;
+        anoSelect.appendChild(opt);
+      }
+      mesSelect.value = new Date().getMonth() + 1;
+    }
+
+    function gerarGraficos(dados) {
+      const nomes = Object.keys(dados.totais);
+      const totais = Object.values(dados.totais);
+      const quantidades = nomes.map(n => dados.qtd[n]);
+      const cores = ['#00d398', '#00b6e3', '#ffaa00', '#ff5e5e', '#6c5ce7',
+                     '#2ecc71', '#e84393', '#0984e3', '#fdcb6e', '#00cec9'];
+      if (chartPizza) chartPizza.destroy();
+      if (chartBarras) chartBarras.destroy();
+      const ctx1 = document.getElementById("chartPizza").getContext("2d");
+      chartPizza = new Chart(ctx1, {
+        type: 'pie',
+        data: { labels: nomes, datasets: [{ data: totais, backgroundColor: cores }] },
+        options: { plugins: { legend: { position: 'bottom', labels: { color: '#e9fff9' } } } }
+      });
+      const ctx2 = document.getElementById("chartBarras").getContext("2d");
+      chartBarras = new Chart(ctx2, {
+        type: 'bar',
+        data: { labels: nomes, datasets: [{ data: quantidades, backgroundColor: cores }] },
+        options: { scales: { x: { ticks: { color: '#e9fff9' } },
+                             y: { beginAtZero: true, ticks: { color: '#e9fff9' } } } }
+      });
+    }
+
+    function atualizarGraficos() {
+      const mesSel = parseInt(document.getElementById("mesFiltro").value);
+      const anoSel = parseInt(document.getElementById("anoFiltro").value);
+      const emprestimos = JSON.parse(localStorage.getItem("emprestimos")) || [];
+      const filtrados = emprestimos.filter(e => {
+        const data = new Date(e.dataEmprestimo);
+        return data.getMonth() + 1 === mesSel && data.getFullYear() === anoSel;
+      });
+      const dados = calcularDados(filtrados);
+      gerarGraficos(dados);
+      if (Object.keys(dados.totais).length === 0) alert(__t?.sem_dados_mes || "Nenhum empréstimo encontrado neste período.");
+    }
+
+    function mostrarTotal() {
+      const emprestimos = JSON.parse(localStorage.getItem("emprestimos")) || [];
+      const dados = calcularDados(emprestimos);
+      gerarGraficos(dados);
+      if (Object.keys(dados.totais).length === 0) alert(__t?.sem_dados_total || "Nenhum empréstimo registrado no sistema.");
+    }
+
+    function calcularDados(lista) {
+      const totaisPorCliente = {}, qtdPorCliente = {};
+      lista.forEach(e => {
+        const totalComJuros = e.valor + (e.valor * (e.juros || 0) / 100);
+        totaisPorCliente[e.nomeCliente] = (totaisPorCliente[e.nomeCliente] || 0) + totalComJuros;
+        qtdPorCliente[e.nomeCliente] = (qtdPorCliente[e.nomeCliente] || 0) + 1;
+      });
+      return { totais: totaisPorCliente, qtd: qtdPorCliente };
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      preencherFiltros();
+      atualizarGraficos();
+    });
+  </script>
 </body>
 </html>
