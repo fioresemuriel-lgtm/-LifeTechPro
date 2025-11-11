@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Life Tech Pro — Dashboard</title>
+<title data-i18n="titulo_dashboard">Life Tech Pro — Dashboard</title>
 <style>
   :root{
     --bg:#071416;
@@ -13,8 +13,14 @@
     --muted:rgba(255,255,255,0.15);
   }
   *{box-sizing:border-box}
-  body{margin:0;background:linear-gradient(180deg,#031616 0%,#072d34 100%);
-       font-family:'Poppins',sans-serif;color:var(--text);overflow-x:hidden}
+  body{
+    margin:0;
+    background:linear-gradient(180deg,#031616 0%,#072d34 100%);
+    font-family:'Poppins',sans-serif;
+    color:var(--text);
+    overflow-x:hidden;
+    transition:background 0.3s, color 0.3s;
+  }
   .wrap{max-width:1200px;margin:28px auto;padding:18px;}
   header{display:flex;align-items:center;justify-content:space-between;padding:10px 0}
   h1{margin:0;color:var(--card);letter-spacing:0.6px}
@@ -50,15 +56,15 @@
     <header>
       <div style="display:flex;align-items:center;gap:18px">
         <div style="width:8px;height:48px;background:var(--card);border-radius:6px"></div>
-        <h1>Life Tech Pro</h1>
+        <h1 data-i18n="titulo">Life Tech Pro</h1>
       </div>
       <nav>
-        <a href="registrar_emprestimo.html">Cadastrar</a>
-        <a href="emprestimos.html">Empréstimos</a>
-        <a href="registro_detalhado.html">Registro Detalhado</a>
-        <a href="relatorios.html">Relatórios</a>
-        <a href="graficos.html">Gráficos</a>
-        <a href="configuracoes.html">Configurações</a>
+        <a href="registrar_emprestimo.html" data-i18n="menu.cadastrar">Cadastrar</a>
+        <a href="emprestimos.html" data-i18n="menu.emprestimos">Empréstimos</a>
+        <a href="registro_detalhado.html" data-i18n="menu.registro">Registro Detalhado</a>
+        <a href="relatorios.html" data-i18n="menu.relatorios">Relatórios</a>
+        <a href="graficos.html" data-i18n="menu.graficos">Gráficos</a>
+        <a href="configuracoes.html" data-i18n="menu.configuracoes">Configurações</a>
       </nav>
     </header>
 
@@ -69,63 +75,85 @@
             <div style="width:64px;height:64px;border-radius:12px;background:rgba(0,0,0,0.12);display:flex;align-items:center;justify-content:center">👤</div>
             <div>
               <div style="font-weight:800">@muriel.fiorese</div>
-              <small style="color:rgba(255,255,255,0.5)">Administrador</small>
+              <small style="color:rgba(255,255,255,0.5)" data-i18n="cargo_admin">Administrador</small>
             </div>
           </div>
           <div style="margin-top:12px">
-            <div style="font-size:0.9rem;color:rgba(255,255,255,0.6)">Atalhos</div>
+            <div style="font-size:0.9rem;color:rgba(255,255,255,0.6)" data-i18n="atalhos">Atalhos</div>
             <div style="display:flex;gap:8px;margin-top:8px">
               <a href="registrar_emprestimo.html" class="btn-link"
                  style="padding:8px 10px;border-radius:8px;background:rgba(255,255,255,0.03);
-                 color:var(--text);text-decoration:none;cursor:pointer">+ Novo</a>
+                 color:var(--text);text-decoration:none;cursor:pointer"
+                 data-i18n="novo">+ Novo</a>
               <a href="emprestimos.html" class="btn-link"
                  style="padding:8px 10px;border-radius:8px;background:rgba(255,255,255,0.03);
-                 color:var(--text);text-decoration:none;cursor:pointer">Relatório</a>
+                 color:var(--text);text-decoration:none;cursor:pointer"
+                 data-i18n="relatorio">Relatório</a>
             </div>
           </div>
         </div>
 
         <div class="card big" style="background:linear-gradient(180deg,#00d398 0%, #00c086 100%);">
-          <div class="title">Team Updates</div>
-          <div style="font-weight:700;color:#042422">Últimas notícias e notas rápidas</div>
+          <div class="title" data-i18n="atualizacoes_time">Atualizações da Equipe</div>
+          <div style="font-weight:700;color:#042422" data-i18n="noticias_rapidas">Últimas notícias e notas rápidas</div>
         </div>
       </div>
 
       <div class="cards">
         <a href="registrar_emprestimo.html" class="card">
           <div class="plus">+</div>
-          <h3>Registrar Empréstimo</h3>
-          <p>Abra o formulário para cadastrar novo empréstimo</p>
+          <h3 data-i18n="registrar_emprestimo">Registrar Empréstimo</h3>
+          <p data-i18n="desc_registrar_emprestimo">Abra o formulário para cadastrar novo empréstimo</p>
         </a>
         <a href="emprestimos.html" class="card">
           <div class="plus">+</div>
-          <h3>Empréstimos Registrados</h3>
-          <p>Ver resumo, editar ou excluir clientes</p>
+          <h3 data-i18n="emprestimos_registrados">Empréstimos Registrados</h3>
+          <p data-i18n="desc_emprestimos_registrados">Ver resumo, editar ou excluir clientes</p>
         </a>
         <a href="registro_detalhado.html" class="card">
           <div class="plus">+</div>
-          <h3>Registro Detalhado</h3>
-          <p>Editar múltiplos empréstimos por cliente</p>
+          <h3 data-i18n="registro_detalhado">Registro Detalhado</h3>
+          <p data-i18n="desc_registro_detalhado">Editar múltiplos empréstimos por cliente</p>
         </a>
         <a href="relatorios.html" class="card">
           <div class="plus">+</div>
-          <h3>Relatórios</h3>
-          <p>Gerar PDF/Excel (em construção)</p>
+          <h3 data-i18n="relatorios">Relatórios</h3>
+          <p data-i18n="desc_relatorios">Gerar PDF ou CSV de registros</p>
         </a>
         <a href="graficos.html" class="card">
           <div class="plus">+</div>
-          <h3>Gráficos</h3>
-          <p>Visão gráfica por cliente</p>
+          <h3 data-i18n="graficos">Gráficos</h3>
+          <p data-i18n="desc_graficos">Visão gráfica por cliente</p>
         </a>
         <a href="configuracoes.html" class="card">
           <div class="plus">+</div>
-          <h3>Configurações</h3>
-          <p>Preferências do sistema</p>
+          <h3 data-i18n="configuracoes">Configurações</h3>
+          <p data-i18n="desc_configuracoes">Preferências do sistema</p>
         </a>
       </div>
     </div>
 
-    <div class="footer">© 2025 — Life Tech Pro · Interface Futurista</div>
+    <div class="footer" data-i18n="rodape">© 2025 — Life Tech Pro · Interface Futurista</div>
   </div>
+
+  <script>
+    // === Carrega preferências e idioma ===
+    document.addEventListener("DOMContentLoaded", () => {
+      const config = JSON.parse(localStorage.getItem("configAgroScan")) || {};
+      if (config.corTema) document.documentElement.style.setProperty("--card", config.corTema);
+      if (config.nomePainel) document.querySelector("h1[data-i18n='titulo']").textContent = config.nomePainel;
+      if (config.preferencias) {
+        if (config.preferencias.fonte) document.body.style.fontSize = config.preferencias.fonte;
+        if (config.preferencias.modo === "on") document.body.classList.add("dark");
+        else if (config.preferencias.modo === "off") document.body.classList.remove("dark");
+        if (window.setLanguage) setLanguage(config.preferencias.idioma || "pt-BR");
+      }
+    });
+  </script>
+
+  <!-- 🌐 Scripts Globais -->
+  <script src="assets/global-config.js"></script>
+  <script src="assets/lang.js"></script>
+  <script src="assets/script.js"></script>
 </body>
 </html>
