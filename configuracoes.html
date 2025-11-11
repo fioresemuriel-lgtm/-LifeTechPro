@@ -3,42 +3,273 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>AgroScan Hub — Configurações</title>
+<title data-i18n="title_config">AgroScan Hub — Configurações</title>
 <link rel="stylesheet" href="assets/style.css">
+<style>
+  :root {
+    --card: #00d398;
+    --bg: #031616;
+    --text: #e9fff9;
+  }
+  body {
+    background: linear-gradient(180deg, #031616 0%, #072d34 100%);
+    font-family: 'Poppins', sans-serif;
+    color: var(--text);
+    transition: background 0.3s, color 0.3s;
+  }
+  .wrap { max-width: 900px; margin: 40px auto; padding: 24px; }
+  header { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
+  h1 { margin: 0; color: var(--card); }
+  nav a {
+    color: rgba(255,255,255,0.6);
+    text-decoration: none;
+    margin-left: 18px;
+    font-weight: 600;
+  }
+  nav a:hover { color: var(--card); }
+  .card {
+    background: rgba(255,255,255,0.05);
+    padding: 24px;
+    border-radius: 14px;
+    margin-top: 24px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+  }
+  h2 { color: var(--card); margin-bottom: 20px; }
+  label { display: block; margin-top: 16px; font-weight: 600; }
+  input, select {
+    width: 100%; padding: 8px 10px; margin-top: 6px;
+    border-radius: 8px; border: none;
+    background: rgba(255,255,255,0.1);
+    color: var(--text); font-size: 1rem;
+  }
+  button {
+    background: var(--card);
+    border: none; padding: 8px 14px; border-radius: 8px;
+    color: #042422; font-weight: 700;
+    cursor: pointer; margin-top: 14px; margin-right: 8px;
+  }
+  button.ghost { background: transparent; color: var(--text); border: 1px solid var(--card); }
+  button:hover { transform: scale(1.05); background: #00b682; }
+  .footer { margin-top: 50px; text-align: center; opacity: 0.5; }
+
+  .tabs { display: flex; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
+  .tab-btn {
+    flex: 1; background: rgba(255,255,255,0.05); border: none;
+    padding: 12px; color: var(--text); font-weight: 600;
+    cursor: pointer; border-radius: 8px 8px 0 0;
+  }
+  .tab-btn.active { background: var(--card); color: #042422; }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  .alert {
+    background: rgba(0, 211, 152, 0.2);
+    color: #00d398;
+    padding: 10px;
+    border-radius: 8px;
+    margin-top: 16px;
+    text-align: center;
+    display: none;
+  }
+
+  body.dark {
+    background: linear-gradient(180deg, #020c0d 0%, #041c1d 100%);
+    color: #cfece4;
+  }
+</style>
 </head>
 <body>
   <div class="wrap">
     <header>
       <div style="display:flex;align-items:center;gap:18px">
         <div style="width:8px;height:48px;background:var(--card);border-radius:6px"></div>
-        <h1>AgroScan Hub</h1>
+        <h1 id="tituloPainel" data-i18n="titulo">AgroScan Hub</h1>
       </div>
       <nav>
-        <a href="index.html">Cadastrar</a>
-        <a href="emprestimos.html">Empréstimos</a>
-        <a href="registro_detalhado.html">Registro Detalhado</a>
+        <a href="index.html" data-i18n="menu.cadastrar">Cadastrar</a>
+        <a href="emprestimos.html" data-i18n="menu.emprestimos">Empréstimos</a>
+        <a href="registro_detalhado.html" data-i18n="menu.registro">Registro Detalhado</a>
+        <a href="graficos.html" data-i18n="menu.graficos">Gráficos</a>
+        <a href="relatorios.html" data-i18n="menu.relatorios">Relatórios</a>
+        <a href="configuracoes.html" data-i18n="menu.configuracoes">Configurações</a>
       </nav>
     </header>
 
     <main class="wrap-inner">
       <section class="card">
-        <h2>Configurações</h2>
-        <label>Cor do Tema
-          <input id="themeColor" type="color" value="#00d398"/>
-        </label>
-        <label>Nome do Painel
-          <input id="panelName" type="text" value="AgroScan Hub" />
-        </label>
-        <div style="margin-top:12px">
-          <button class="btn" id="btnSaveConfig">Salvar</button>
-          <button class="btn ghost" id="btnReset">Resetar Dados</button>
+        <h2 data-i18n="config.titulo">Configurações</h2>
+
+        <div class="tabs">
+          <button class="tab-btn active" data-tab="geral" data-i18n="config.geral">Geral</button>
+          <button class="tab-btn" data-tab="dados" data-i18n="config.dados">Dados</button>
+          <button class="tab-btn" data-tab="preferencias" data-i18n="config.preferencias">Preferências</button>
         </div>
+
+        <div class="tab-content active" id="geral">
+          <label data-i18n="config.corTema">🎨 Cor do Tema</label>
+          <input id="themeColor" type="color" value="#00d398"/>
+
+          <label data-i18n="config.nomePainel">🧾 Nome do Painel</label>
+          <input id="panelName" type="text" value="AgroScan Hub" />
+
+          <button id="btnSaveConfig" data-i18n="botoes.salvar">💾 Salvar</button>
+        </div>
+
+        <div class="tab-content" id="dados">
+          <label data-i18n="config.backup">📦 Backup e Restauração</label>
+          <button id="btnBackup" data-i18n="botoes.backup">⬇️ Fazer Backup</button>
+          <input type="file" id="fileRestore" accept=".json" style="display:none"/>
+          <button id="btnRestore" data-i18n="botoes.restaurar">⬆️ Restaurar Backup</button>
+
+          <hr style="margin:20px 0;border:1px solid rgba(255,255,255,0.1)">
+          <button class="ghost" id="btnReset" data-i18n="botoes.resetar">🗑️ Resetar Tudo</button>
+        </div>
+
+        <div class="tab-content" id="preferencias">
+          <label data-i18n="config.idioma">🌍 Idioma</label>
+          <select id="lang">
+            <option value="pt-BR" data-i18n="idiomas.pt">Português (Brasil)</option>
+            <option value="en-US" data-i18n="idiomas.en">English</option>
+            <option value="es-ES" data-i18n="idiomas.es">Español</option>
+          </select>
+
+          <label data-i18n="config.modoEscuro">🌙 Modo Escuro</label>
+          <select id="darkMode">
+            <option value="auto" data-i18n="modo.auto">Automático</option>
+            <option value="on" data-i18n="modo.on">Ativado</option>
+            <option value="off" data-i18n="modo.off">Desativado</option>
+          </select>
+
+          <label data-i18n="config.tamanhoFonte">🔠 Tamanho da Fonte</label>
+          <select id="fontSize">
+            <option value="14px" data-i18n="fonte.pequeno">Pequeno</option>
+            <option value="16px" selected data-i18n="fonte.medio">Médio</option>
+            <option value="18px" data-i18n="fonte.grande">Grande</option>
+          </select>
+
+          <button id="btnSavePrefs" data-i18n="botoes.salvarPrefs">💾 Salvar Preferências</button>
+        </div>
+
+        <div class="alert" id="alertBox" data-i18n="alert">✅ Alterações salvas com sucesso!</div>
       </section>
     </main>
 
-    <div class="footer">© 2025 — AgroScan · Design Futurista</div>
+    <div class="footer" data-i18n="footer">© 2025 — AgroScan · Design Futurista</div>
   </div>
 
-<script src="assets/script.js"></script>
+  <script>
+    // === Alternar abas ===
+    document.querySelectorAll(".tab-btn").forEach(btn=>{
+      btn.onclick=()=>{
+        document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
+        document.querySelectorAll(".tab-content").forEach(c=>c.classList.remove("active"));
+        btn.classList.add("active");
+        document.getElementById(btn.dataset.tab).classList.add("active");
+      };
+    });
+
+    const alertBox=document.getElementById("alertBox");
+    const tituloPainel=document.getElementById("tituloPainel");
+    const themeInput=document.getElementById("themeColor");
+    const panelNameInput=document.getElementById("panelName");
+
+    const prefs={
+      lang:document.getElementById("lang"),
+      dark:document.getElementById("darkMode"),
+      font:document.getElementById("fontSize")
+    };
+
+    function carregarConfiguracoes(){
+      const config=JSON.parse(localStorage.getItem("configAgroScan"))||{};
+      if(config.corTema){document.documentElement.style.setProperty("--card",config.corTema);themeInput.value=config.corTema;}
+      if(config.nomePainel){panelNameInput.value=config.nomePainel;tituloPainel.textContent=config.nomePainel;}
+      if(config.preferencias){
+        prefs.lang.value=config.preferencias.idioma||"pt-BR";
+        prefs.dark.value=config.preferencias.modo||"auto";
+        prefs.font.value=config.preferencias.fonte||"16px";
+        document.body.style.fontSize=prefs.font.value;
+        aplicarModoEscuro(config.preferencias.modo);
+        if(window.setLanguage) setLanguage(config.preferencias.idioma);
+      }
+    }
+
+    function aplicarModoEscuro(modo){
+      if(modo==="on") document.body.classList.add("dark");
+      else if(modo==="off") document.body.classList.remove("dark");
+      else if(window.matchMedia("(prefers-color-scheme: dark)").matches)
+        document.body.classList.add("dark");
+    }
+
+    function salvarConfig(){
+      const config=JSON.parse(localStorage.getItem("configAgroScan"))||{};
+      config.corTema=themeInput.value;
+      config.nomePainel=panelNameInput.value;
+      document.documentElement.style.setProperty("--card",config.corTema);
+      tituloPainel.textContent=config.nomePainel;
+      localStorage.setItem("configAgroScan",JSON.stringify(config));
+      mostrarAlerta();
+    }
+
+    document.getElementById("btnSaveConfig").onclick=salvarConfig;
+    document.getElementById("btnSavePrefs").onclick=()=>{
+      const config=JSON.parse(localStorage.getItem("configAgroScan"))||{};
+      config.preferencias={
+        idioma:prefs.lang.value,
+        modo:prefs.dark.value,
+        fonte:prefs.font.value
+      };
+      document.body.style.fontSize=prefs.font.value;
+      aplicarModoEscuro(prefs.dark.value);
+      localStorage.setItem("configAgroScan",JSON.stringify(config));
+      mostrarAlerta();
+
+      // 🔁 Aplica idioma automaticamente após salvar
+      if(window.setLanguage) setLanguage(prefs.lang.value);
+    };
+
+    document.getElementById("btnBackup").onclick=()=>{
+      const dados={
+        emprestimos:JSON.parse(localStorage.getItem("emprestimos"))||[],
+        configAgroScan:JSON.parse(localStorage.getItem("configAgroScan"))||{}
+      };
+      const blob=new Blob([JSON.stringify(dados,null,2)],{type:"application/json"});
+      const a=document.createElement("a");
+      a.href=URL.createObjectURL(blob);
+      a.download="backup_agroscan.json";a.click();
+    };
+
+    document.getElementById("btnRestore").onclick=()=>document.getElementById("fileRestore").click();
+    document.getElementById("fileRestore").onchange=e=>{
+      const f=e.target.files[0];if(!f)return;
+      const r=new FileReader();
+      r.onload=x=>{
+        try{
+          const d=JSON.parse(x.target.result);
+          if(d.emprestimos)localStorage.setItem("emprestimos",JSON.stringify(d.emprestimos));
+          if(d.configAgroScan)localStorage.setItem("configAgroScan",JSON.stringify(d.configAgroScan));
+          alert("✅ Backup restaurado!");location.reload();
+        }catch{alert("⚠️ Arquivo inválido.");}
+      };
+      r.readAsText(f);
+    };
+
+    document.getElementById("btnReset").onclick=()=>{
+      if(confirm("Apagar todos os dados e configurações?")){
+        localStorage.clear();alert("🔄 Tudo resetado!");location.reload();
+      }
+    };
+
+    function mostrarAlerta(){
+      alertBox.style.display="block";
+      setTimeout(()=>alertBox.style.display="none",2000);
+    }
+
+    document.addEventListener("DOMContentLoaded",carregarConfiguracoes);
+  </script>
+
+  <!-- 🌐 Scripts Globais -->
+  <script src="assets/global-config.js"></script>
+  <script src="assets/lang.js"></script>
+  <script src="assets/script.js"></script>
 </body>
 </html>
